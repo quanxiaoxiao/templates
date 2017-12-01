@@ -17,11 +17,13 @@ module.exports = {
     flag: 'container',
     to: 'src/containers/_',
   },
+
   reducer: {
     from: path.resolve(__dirname, './templates/reducer/__reducer__.js'),
     flag: 'reducer',
     to: 'src/reducers',
   },
+
   react: {
     from: path.resolve(__dirname, './templates/react'),
     to: '_',
@@ -52,6 +54,7 @@ module.exports = {
         'cross-env',
         'css-loader',
         'extract-text-webpack-plugin',
+        'file-loader',
         'html-webpack-plugin',
         'lodash-webpack-plugin',
         'node-sass',
@@ -71,6 +74,6 @@ module.exports = {
 
   config: {
     from: path.resolve(__dirname, './templates/config'),
-    to: '_',
+    to: '.',
   },
 };
