@@ -4,8 +4,6 @@ const {
   output,
   urlLoader,
   jsLoader,
-  cssLoader,
-  sassLoader,
   plugins,
   resolve,
 } = require('./webpack.config.js');
@@ -18,18 +16,39 @@ module.exports = {
   module: {
     rules: [
       jsLoader(),
-      sassLoader(['style-loader']),
-      cssLoader(['style-loader']),
       urlLoader(),
+
+      {
+        test: /global\.css$/,
+        use: [
+          'style-loader',
+          'css-loader?sourceMap',
+        ],
+      },
+
+      {
+        test: /^((?!global).)*\.css$/,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              modules: true,
+              importLoaders: 1,
+              sourceMap: true,
+              localIdentName: '[name]__[local]___[hash:base64:5]',
+            },
+          },
+          'postcss-loader',
+        ],
+      },
+
     ],
   },
 
   resolve: resolve(),
 
   plugins: plugins([
-    new webpack.DefinePlugin({
-      __DEVELOPMENT__: true,
-    }),
     new webpack.HotModuleReplacementPlugin(),
   ]),
 };

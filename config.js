@@ -57,11 +57,12 @@ module.exports = {
         'file-loader',
         'html-webpack-plugin',
         'lodash-webpack-plugin',
-        'node-sass',
+        'optimize-js-plugin',
+        'postcss-css-variables',
         'postcss-loader',
+        'postcss-nested',
         'redux-logger',
         'rimraf',
-        'sass-loader',
         'style-loader',
         'url-loader',
         'webpack',
@@ -74,6 +75,5 @@ module.exports = {
 
   config: {
     from: path.resolve(__dirname, './templates/config'),
-    to: '.',
   },
 };

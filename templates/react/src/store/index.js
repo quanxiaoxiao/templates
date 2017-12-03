@@ -12,7 +12,7 @@ export default function configureStore(initialState = {}) {
   ];
   const enhancers = [];
 
-  if (__DEVELOPMENT__) {
+  if (process.env.NODE_ENV === 'development') {
     const { createLogger } = require('redux-logger'); // eslint-disable-line
     const loggerMiddleware = createLogger({
       level: 'info',
@@ -34,7 +34,7 @@ export default function configureStore(initialState = {}) {
     ),
   );
 
-  if (__DEVELOPMENT__ && module.hot) {
+  if (process.env.NODE_ENV === 'development' && module.hot) {
     module.hot.accept('../reducers', () => {
       store.replaceReducer(require('../reducers').default);
     });

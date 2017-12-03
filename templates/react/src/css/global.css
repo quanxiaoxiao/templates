@@ -1,4 +1,4 @@
-@import '~normalize.css/normalize';
+@import '../../node_modules/normalize.css/normalize.css';
 
 table {
   border-collapse: collapse;
@@ -14,7 +14,7 @@ html,
 body {
   margin: 0;
   padding: 0;
-  height: 100%;
+  background: #ccc;
 }
 
 *,

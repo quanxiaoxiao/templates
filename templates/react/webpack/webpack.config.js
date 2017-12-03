@@ -2,7 +2,6 @@ const webpack = require('webpack');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
-const autoprefixer = require('autoprefixer');
 
 const output = (other = {}) => ({
   path: path.resolve(__dirname, '..', 'dist'),
@@ -33,48 +32,11 @@ const jsLoader = (loaders = []) => ({
 });
 
 const urlLoader = (loaders = []) => ({
-  test: /\.(png|jpg|gif|ttf|eot|svg|woff(2)?)(\?[a-z0-9])?$/,
+  test: /\.(png|jpe?g|gif|ttf|eot|svg|woff(2)?)(\?[a-z0-9])?$/,
   use: [
     ...loaders,
     'url-loader',
   ],
-});
-
-const sassLoader = (loaders = []) => ({
-  test: /\.scss$/,
-  use: [
-    ...loaders,
-    {
-      loader: 'css-loader',
-      options: {
-        modules: true,
-        importLoaders: 1,
-        localIdentName: '[name]__[local]___[hash:base64:5]',
-      },
-    },
-    {
-      loader: 'postcss-loader',
-      options: {
-        plugins: () => [autoprefixer],
-      },
-    },
-    'sass-loader',
-  ],
-});
-
-const cssLoader = (loaders = []) => ({
-  test: /\.css$/,
-  use: [
-    ...loaders,
-    'css-loader',
-    {
-      loader: 'postcss-loader',
-      options: {
-        plugins: () => [autoprefixer],
-      },
-    },
-  ],
-
 });
 
 const resolve = (other = {}) => ({
@@ -108,8 +70,6 @@ module.exports = {
   entry,
   jsLoader,
   urlLoader,
-  sassLoader,
-  cssLoader,
   plugins,
   resolve,
 };
