@@ -20,6 +20,11 @@ module.exports = {
 
   reducer: {
     from: path.resolve(__dirname, './templates/reducer/__reducer__.js'),
+    '/quan': {
+      from: path.resolve(__dirname, './templates/react-container'),
+      to: 'src/aaa',
+    },
+    '/rice': 'src/rice',
     flag: 'reducer',
     to: 'src/reducers',
   },
@@ -27,7 +32,11 @@ module.exports = {
   react: {
     from: path.resolve(__dirname, './templates/react'),
     to: '_',
-    post: ({ name }) => {
+    '/view': {
+      from: path.resolve(__dirname, './templates/react-view'),
+      to: '_',
+    },
+    post: ({ name, flag }) => {
       shelljs.cd(name);
       const dependencies = [
         'babel-polyfill',
@@ -68,6 +77,9 @@ module.exports = {
         'webpack',
         'webpack-hot-middleware',
       ];
+      if (flag === '/view') {
+        dependencies.push('react-router-dom');
+      }
       shelljs.exec(`npm install ${dependencies.join(' ')}`);
       shelljs.exec(`npm install --save-dev ${devDependencies.join(' ')}`);
     },
@@ -76,4 +88,5 @@ module.exports = {
   config: {
     from: path.resolve(__dirname, './templates/config'),
   },
+
 };
