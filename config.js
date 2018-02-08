@@ -20,11 +20,6 @@ module.exports = {
 
   reducer: {
     from: path.resolve(__dirname, './templates/reducer/__reducer__.js'),
-    '/quan': {
-      from: path.resolve(__dirname, './templates/react-container'),
-      to: 'src/aaa',
-    },
-    '/rice': 'src/rice',
     flag: 'reducer',
     to: 'src/reducers',
   },
@@ -79,6 +74,9 @@ module.exports = {
       ];
       if (flag === '/view') {
         dependencies.push('react-router-dom');
+        dependencies.push('react-router-redux@next');
+        dependencies.push('history');
+        dependencies.push('qs');
       }
       shelljs.exec(`npm install ${dependencies.join(' ')}`);
       shelljs.exec(`npm install --save-dev ${devDependencies.join(' ')}`);
