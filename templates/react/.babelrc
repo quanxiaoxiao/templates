@@ -1,12 +1,8 @@
 {
-  "presets": [
-    "env",
-    "stage-0",
-    "react"
-  ],
-  "env": {
+  "presets": ["env", "react", "stage-0"],
+  "env" : {
     "development": {
-      "presets": ["react-hmre"]
+      "plugins": ["react-hot-loader/babel"]
     }
   }
 }

@@ -1,23 +1,16 @@
 const webpack = require('webpack');
-const {
-  entry,
-  output,
-  urlLoader,
-  jsLoader,
-  plugins,
-  resolve,
-} = require('./webpack.config.js');
+const merge = require('webpack-merge');
+const common = require('./webpack.common');
+const path = require('path');
 
-module.exports = {
-  devtool: 'inline-source-map',
-  entry: entry({ app: ['webpack-hot-middleware/client', './src/index.js'] }),
-  output: output(),
-
+module.exports = merge(common, {
+  mode: 'development',
+  entry: [
+    path.resolve(__dirname, 'src/index.js'),
+    'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000',
+  ],
   module: {
     rules: [
-      jsLoader(),
-      urlLoader(),
-
       {
         test: /global\.css$/,
         use: [
@@ -25,7 +18,6 @@ module.exports = {
           'css-loader?sourceMap',
         ],
       },
-
       {
         test: /^((?!global).)*\.css$/,
         use: [
@@ -42,13 +34,9 @@ module.exports = {
           'postcss-loader',
         ],
       },
-
     ],
   },
-
-  resolve: resolve(),
-
-  plugins: plugins([
+  plugins: [
     new webpack.HotModuleReplacementPlugin(),
-  ]),
-};
+  ],
+});

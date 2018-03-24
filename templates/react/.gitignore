@@ -1,6 +1,4 @@
 node_modules
-*.swp
-*.log
 dist
-public
-coverage
+*.log
+*.swp

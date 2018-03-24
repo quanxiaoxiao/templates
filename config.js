@@ -34,7 +34,6 @@ module.exports = {
     post: ({ name, flag }) => {
       shelljs.cd(name);
       const dependencies = [
-        'babel-polyfill',
         'classnames',
         'lodash',
         'normalize.css',
@@ -47,30 +46,25 @@ module.exports = {
         'redux-thunk',
       ];
       const devDependencies = [
-        'autoprefixer',
         'babel-core',
         'babel-loader',
-        'babel-plugin-transform-runtime',
         'babel-preset-env',
         'babel-preset-react',
-        'babel-preset-react-hmre',
         'babel-preset-stage-0',
-        'cross-env',
         'css-loader',
-        'extract-text-webpack-plugin',
-        'file-loader',
+        'extract-text-webpack-plugin@next',
         'html-webpack-plugin',
-        'lodash-webpack-plugin',
-        'optimize-js-plugin',
         'postcss-css-variables',
         'postcss-loader',
         'postcss-nested',
         'redux-logger',
-        'rimraf',
         'style-loader',
         'url-loader',
+        'react-hot-loader',
         'webpack',
+        'webpack-cli',
         'webpack-hot-middleware',
+        'webpack-merge',
       ];
       if (flag === '/view') {
         dependencies.push('react-router-dom');

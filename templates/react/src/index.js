@@ -1,10 +1,10 @@
-import 'babel-polyfill';
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
+import App from 'containers/App';
+
 import configureStore from './store';
-import './css/global.css';
-import App from './containers/App';
+import './global.css';
 
 const store = configureStore();
 

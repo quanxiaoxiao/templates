@@ -1,25 +1,14 @@
-const ExtractTextplugin = require('extract-text-webpack-plugin');
-const OptimizeJsPlugin = require('optimize-js-plugin');
+const merge = require('webpack-merge');
 const webpack = require('webpack');
-const {
-  entry,
-  output,
-  urlLoader,
-  jsLoader,
-  plugins,
-  resolve,
-} = require('./webpack.config.js');
+const ExtractTextplugin = require('extract-text-webpack-plugin');
+const common = require('./webpack.common');
+const path = require('path');
 
-
-module.exports = {
-  entry: entry(),
-  output: output(),
-
+module.exports = merge(common, {
+  mode: 'production',
+  entry: path.resolve(__dirname, 'src/index.js'),
   module: {
     rules: [
-      jsLoader(),
-      urlLoader(),
-
       {
         test: /global\.css$/,
         use: ExtractTextplugin.extract({
@@ -47,19 +36,12 @@ module.exports = {
       },
     ],
   },
-
-  resolve: resolve(),
-
-  plugins: plugins([
+  plugins: [
     new ExtractTextplugin({ filename: 'style.css', allChunks: true }),
-    new webpack.optimize.UglifyJsPlugin(),
     new webpack.LoaderOptionsPlugin({
       test: /\.css$/,
       minimize: true,
       debug: false,
     }),
-    new OptimizeJsPlugin({
-      sourceMap: false,
-    }),
-  ]),
-};
+  ],
+});
