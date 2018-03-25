@@ -2,7 +2,7 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import promiseMiddleware from 'redux-promise';
 
-import rootReducer from '../data/reducer';
+import rootReducer from './data/reducer';
 
 export default function configureStore(initialState = {}) {
   const middlewares = [
@@ -24,7 +24,6 @@ export default function configureStore(initialState = {}) {
       enhancers.push(devToolsExtension());
     }
   }
-
   const store = createStore(
     rootReducer,
     initialState,
@@ -33,11 +32,5 @@ export default function configureStore(initialState = {}) {
       ...enhancers,
     ),
   );
-
-  if (process.env.NODE_ENV === 'development' && module.hot) {
-    module.hot.accept('../data/reducer', () => {
-      store.replaceReducer(require('../data/reducer').default);
-    });
-  }
   return store;
 }
