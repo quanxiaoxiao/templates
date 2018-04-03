@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "norice",
-    "prod": "rm -rf dist && webpack --config webpack.prod.js"
+    "build": "rm -rf dist && webpack --config webpack.prod.js"
   },
   "devDependencies": {
   },
