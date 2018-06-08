@@ -1,0 +1,13 @@
+{
+  "name": "{{name}}",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "dev": "norice",
+    "build": "rm -rf dist && webpack --config webpack/webpack.prod.js"
+  },
+  "devDependencies": {
+  },
+  "dependencies": {
+  }
+}

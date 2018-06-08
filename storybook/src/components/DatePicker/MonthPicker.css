@@ -1,0 +1,28 @@
+.main {
+}
+
+.item {
+  display: inline-block;
+  width: 33.33%;
+  height: 42px;
+  line-height: 42px;
+  text-align: center;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background 0.3s;
+
+  &:hover {
+    background: #f0f0f0;
+  }
+
+  &.currentMonth {
+    color: #1890ff;
+  }
+
+  &.active {
+    background: #1890ff;
+    color: #fff;
+  }
+}
