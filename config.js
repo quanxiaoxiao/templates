@@ -64,11 +64,11 @@ module.exports = {
     to: `${ctx.params.name}/src`,
     after: () => {
       process.chdir(ctx.params.name);
-      shelljs.exec(`temp2 create "configs?type=react&name=${ctx.params.name}"`);
-      shelljs.exec('temp2 create webpack');
-      shelljs.exec('temp2 create components');
+      shelljs.exec(`templ create "configs?type=react&name=${ctx.params.name}"`);
+      shelljs.exec('templ create webpack');
+      shelljs.exec('templ create components');
       if (ctx.query.type === 'view') {
-        shelljs.exec('temp2 create "react/view/View"');
+        shelljs.exec('templ create "react/view/View"');
       }
       const dependencies = [
         'classnames',
@@ -132,8 +132,37 @@ module.exports = {
       from: path.resolve(__dirname, 'components'),
       exclude,
       handlePathName: name => name.replace(/__name__(?=\.)/, ctx.query.name || ctx.params.name),
+      handleContent: content => Handlebars.compile(content)({
+        name: ctx.query.name || ctx.params.name,
+      }),
+      to,
+    };
+  },
+  'container/:name': (ctx) => {
+    let to = `src/containers/${ctx.params.name}`;
+    if (ctx.query.scene) {
+      to = `src/scenes/${ctx.query.scene}/containers/${ctx.params.name}`;
+    }
+    return {
+      from: path.resolve(__dirname, 'containers'),
+      handlePathName: name => name.replace(/__name__(?=\.)/, ctx.query.name || ctx.params.name),
       handleContent: content => Handlebars.compile(content)({ name: ctx.params.name }),
       to,
+    };
+  },
+  'container/component/:name': (ctx) => {
+    let to = `src/containers/${ctx.params.name}`;
+    if (ctx.query.scene) {
+      to = `src/scenes/${ctx.query.scene}/containers/${ctx.params.name}`;
+    }
+    return {
+      from: path.resolve(__dirname, 'containers'),
+      handlePathName: name => name.replace(/__name__(?=\.)/, ctx.query.name || ctx.params.name),
+      handleContent: content => Handlebars.compile(content)({ name: ctx.params.name }),
+      to,
+      after: () => {
+        shelljs.exec(`templ create component/${ctx.params.name}?${qs.stringify(ctx.query)}`);
+      },
     };
   },
   'reducer/:name': ctx => ({
@@ -151,7 +180,7 @@ module.exports = {
             .map(a => path.basename(a, '.js')),
         scene: ctx.query.scene,
       };
-      shelljs.exec(`temp2 update 'rootReducer?${qs.stringify(query)}'`);
+      shelljs.exec(`templ update 'rootReducer?${qs.stringify(query)}'`);
     },
   }),
   rootReducer: ctx => ({
