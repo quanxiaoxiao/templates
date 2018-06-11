@@ -13,5 +13,6 @@ module.exports = {
         '--axis-color': '#fff',
       },
     },
+    'postcss-color-function': {},
   },
 };

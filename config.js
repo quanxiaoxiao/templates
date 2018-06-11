@@ -91,6 +91,7 @@ module.exports = {
         'css-loader',
         'extract-text-webpack-plugin@next',
         'html-webpack-plugin',
+        'postcss-color-function',
         'postcss-css-variables',
         'postcss-loader',
         'postcss-nested',
