@@ -214,6 +214,24 @@ module.exports = {
         'src/actions',
     });
   },
+  'koa/:name': ({ params }, cb) => {
+    cb({
+      from: path.resolve(__dirname, 'koa'),
+      to: params.name,
+      handleContent: content => Handlebars.compile(content)({
+        name: params.name,
+      }),
+      complete: () => {
+        process.chdir(params.name);
+        const dependencies = [
+          'koa',
+          'koa-router',
+          'koa-logger',
+        ];
+        command(`npm install ${dependencies.join(' ')}`);
+      },
+    });
+  },
   'test/:name': ({ params }) => {
     try {
       fs.readdirSync(params.name);
