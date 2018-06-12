@@ -2,8 +2,9 @@ const fs = require('fs');
 const qs = require('querystring');
 const path = require('path');
 const Handlebars = require('handlebars');
-const shelljs = require('shelljs');
 const _ = require('lodash');
+
+const command = require('./lib/command');
 
 module.exports = {
   'component/:name': ({ params, query }, cb) => {
@@ -36,7 +37,7 @@ module.exports = {
       to: 'src/components',
       complete: (type) => {
         if (type === 'create') {
-          shelljs.exec('npm install moment');
+          command('npm install moment');
         }
       },
     });
@@ -95,13 +96,13 @@ module.exports = {
       to: `${params.name}/src`,
       complete: () => {
         process.chdir(params.name);
-        shelljs.exec('tpl create reducer/quan');
-        shelljs.exec(`tpl create package/react?name=${params.name}`);
-        shelljs.exec('tpl create configs?type=react');
-        shelljs.exec('tpl create webpack');
-        shelljs.exec('tpl create components');
+        command('tpl create reducer/quan');
+        command(`tpl create package/react?name=${params.name}`);
+        command('tpl create configs?type=react');
+        command('tpl create webpack');
+        command('tpl create components');
         if (query.type === 'view') {
-          shelljs.exec('tpl create react/view/View');
+          command('tpl create react/view/View');
         }
         const dependencies = [
           'classnames',
@@ -144,8 +145,8 @@ module.exports = {
           dependencies.push('history');
           dependencies.push('qs');
         }
-        shelljs.exec(`npm install ${dependencies.join(' ')}`);
-        shelljs.exec(`npm install --save-dev ${devDependencies.join(' ')}`);
+        command(`npm install ${dependencies.join(' ')}`);
+        command(`npm install --save-dev ${devDependencies.join(' ')}`);
       },
     });
   },
@@ -162,8 +163,8 @@ module.exports = {
     });
   },
   'container/component/:name': ({ params, query }) => {
-    shelljs.exec(`tpl create container/${params.name}?${qs.stringify(query)}`);
-    shelljs.exec(`tpl create component/${params.name}?${qs.stringify(query)}`);
+    command(`tpl create container/${params.name}?${qs.stringify(query)}`);
+    command(`tpl create component/${params.name}?${qs.stringify(query)}`);
   },
   'reducer/:name': ({ query, params }, cb) => {
     cb({
@@ -181,7 +182,7 @@ module.exports = {
               .map(a => path.basename(a, '.js')),
           scene: query.scene,
         };
-        shelljs.exec(`tpl update 'rootReducer?${qs.stringify(_query)}'`);
+        command(`tpl update 'rootReducer?${qs.stringify(_query)}'`);
       },
     });
   },
@@ -212,5 +213,15 @@ module.exports = {
         `src/scenes/${query.scene}/data/${params.name}` :
         'src/actions',
     });
+  },
+  'test/:name': ({ params }) => {
+    try {
+      fs.readdirSync(params.name);
+    } catch (e) {
+      fs.mkdirSync(params.name);
+    }
+    process.chdir(params.name);
+    command('tpl create configs');
+    command(`echo "console.log('hello world');" > index.js`); // eslint-disable-line
   },
 };
