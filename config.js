@@ -95,6 +95,7 @@ module.exports = {
       to: `${params.name}/src`,
       complete: () => {
         process.chdir(params.name);
+        shelljs.exec('tpl create reducer/quan');
         shelljs.exec(`tpl create package/react?name=${params.name}`);
         shelljs.exec('tpl create configs?type=react');
         shelljs.exec('tpl create webpack');
@@ -160,20 +161,9 @@ module.exports = {
       to,
     });
   },
-  'container/component/:name': ({ params, query }, cb) => {
-    let to = `src/containers/${params.name}`;
-    if (query.scene) {
-      to = `src/scenes/${query.scene}/containers/${params.name}`;
-    }
-    cb({
-      from: path.resolve(__dirname, 'containers'),
-      handlePathName: name => name.replace(/__name__(?=\.)/, params.name),
-      handleContent: content => Handlebars.compile(content)({ name: params.name }),
-      to,
-      complete: () => {
-        shelljs.exec(`templ create component/${params.name}?${qs.stringify(query)}`);
-      },
-    });
+  'container/component/:name': ({ params, query }) => {
+    shelljs.exec(`tpl create container/${params.name}?${qs.stringify(query)}`);
+    shelljs.exec(`tpl create component/${params.name}?${qs.stringify(query)}`);
   },
   'reducer/:name': ({ query, params }, cb) => {
     cb({
