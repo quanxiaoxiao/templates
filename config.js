@@ -1,9 +1,7 @@
-const fs = require('fs');
 const qs = require('querystring');
 const path = require('path');
 const Handlebars = require('handlebars');
 const shelljs = require('shelljs');
-const _ = require('lodash');
 
 module.exports = {
   'component/:name': ({ params, query }, cb) => {
@@ -99,8 +97,9 @@ module.exports = {
         shelljs.exec('tpl create components');
         if (query.type === 'view') {
           shelljs.exec('tpl create react/view/View');
+          shelljs.exec('tpl create reducer/resource?scene=root');
         } else {
-          shelljs.exec('tpl create reducer/quan');
+          shelljs.exec('tpl create reducer/resource');
         }
         const dependencies = [
           'classnames',
@@ -164,46 +163,50 @@ module.exports = {
     shelljs.exec(`tpl create container/${params.name}?${qs.stringify(query)}`);
     shelljs.exec(`tpl create component/${params.name}?${qs.stringify(query)}`);
   },
-  'reducer/scene/root': (ctx, cb) => {
-    cb({
-      from: path.resolve(__dirname, 'reducer/sceneReducer.js'),
-      handlePathName: () => 'reducer.js',
-      to: 'src/data',
-    });
-  },
   'reducer/:name': ({ query, params }, cb) => {
-    const from = path.resolve(__dirname, 'reducer/reducer.js');
+    const toDir = (query.scene && query.scene !== 'root') ?
+      `src/scenes/${query.scene}/data` :
+      'src/data';
     cb({
-      from,
-      handlePathName: name => (query.scene ? name : `${params.name}.js`),
-      to: query.scene ?
-        `src/scenes/${query.scene}/data/${params.name}` :
-        'src/reducers',
+      from: path.resolve(__dirname, 'reducer/reducer.js'),
+      handlePathName: () => 'reducer.js',
+      to: path.join(toDir, params.name),
       complete: () => {
-        const _query = {
-          list: query.scene ?
-            fs.readdirSync(`src/scenes/${query.scene}/data`) :
-            fs.readdirSync('src/reducers')
-              .filter(a => a !== 'index.js' && !/\.swp$/.test(a))
-              .map(a => path.basename(a, '.js')),
-          scene: query.scene,
-        };
-        shelljs.exec(`tpl update 'rootReducer?${qs.stringify(_query)}'`);
+        shelljs.exec(`tpl update 'rootReducer?${qs.stringify(query)}'`);
       },
     });
   },
   rootReducer: ({ query }, cb) => {
+    const toDir = (query.scene && query.scene !== 'root') ?
+      `src/scenes/${query.scene}/data` :
+      'src/data';
+    const list = shelljs.ls('-l', toDir)
+      .filter(item => item.isDirectory())
+      .map(item => item.name);
+    let sceneList = [];
+    if (query.scene === 'root') {
+      try {
+        sceneList = shelljs.find('src/scenes/*/reducer.js')
+          .map(pathName => ({
+            pathName: pathName.replace(/^src\//, ''),
+            name: pathName.match(/\/([^/]+)\/reducer\.js$/)[1],
+          }));
+      } catch (e) {
+        // ignore
+      }
+    }
     cb({
       from: path.resolve(__dirname, 'reducer/rootReducer.js'),
-      handlePathName: () => (query.scene ? 'reducer.js' : 'index.js'),
+      handlePathName: () => 'reducer.js',
       handleContent: content => Handlebars.compile(content)({
-        scene: query.scene,
-        list: (Array.isArray(query.list) ? // eslint-disable-line
-          query.list : _.isEmpty(query.list) ? [] : [query.list]).map(a => ({
-          reducer: a,
+        scene: query.scene && query.scene !== 'root',
+        hasRouter: query.scene === 'root',
+        sceneList,
+        list: list.map(name => ({
+          reducer: name,
         })),
       }),
-      to: query.scene ? `src/scenes/${query.scene}` : 'src/reducers',
+      to: (query.scene && query.scene !== 'root') ? `src/scenes/${query.scene}` : 'src/data',
     });
   },
   'action/:name': ({ params, query }, cb) => {
@@ -217,7 +220,7 @@ module.exports = {
       }),
       to: query.scene ?
         `src/scenes/${query.scene}/data/${params.name}` :
-        'src/actions',
+        `src/data/${query.name}`,
     });
   },
   'koa/:name': ({ params }, cb) => {
