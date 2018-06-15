@@ -19,7 +19,7 @@ module.exports = {
   },
   output: {
     filename: '[name].js',
-    path: path.resolve(__dirname, '..', 'dist'),
+    path: path.resolve(__dirname, 'dist'),
     publicPath: '/',
   },
   optimization: {
@@ -59,13 +59,13 @@ module.exports = {
   },
   resolve: {
     modules: [
-      path.resolve(__dirname, '..', 'src'),
+      path.resolve(__dirname, 'src'),
       'node_modules',
     ],
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, '..', 'src/index.html'),
+      template: path.resolve(__dirname, 'src/index.html'),
     }),
   ],
 };

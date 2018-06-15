@@ -1,9 +1,15 @@
 {
+{{#if react}}
   "presets": ["env", "react", "stage-0"],
+  {{else}}
+  "presets": ["env", "stage-0"],
+{{/if}}
   "plugins": ["transform-runtime"],
   "env" : {
+{{#if react}}
     "development": {
       "plugins": ["react-hot-loader/babel"]
     }
+{{/if}}
   }
 }

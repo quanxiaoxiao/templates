@@ -2,9 +2,8 @@ const fs = require('fs');
 const qs = require('querystring');
 const path = require('path');
 const Handlebars = require('handlebars');
+const shelljs = require('shelljs');
 const _ = require('lodash');
-
-const command = require('./lib/command');
 
 module.exports = {
   'component/:name': ({ params, query }, cb) => {
@@ -37,7 +36,7 @@ module.exports = {
       to: 'src/components',
       complete: (type) => {
         if (type === 'create') {
-          command('npm install moment');
+          shelljs.exec('npm install moment');
         }
       },
     });
@@ -46,33 +45,32 @@ module.exports = {
     const include = [
       /\.gitignore$/,
       /\.editorconfig$/,
+      /\.eslintrc$/,
     ];
-    if (query.type === 'react') {
-      include.push(/\.react_eslintrc$/);
+    if (query.type === 'react' || query.type === 'client') {
       include.push(/norice\.config\.js$/);
       include.push(/postcss\.config\.js/);
       include.push(/\.babelrc$/);
-    } else {
-      include.push(/\.eslintrc$/);
+      include.push(/package\.json$/);
     }
     cb({
       from: path.resolve(__dirname, 'config'),
-      handlePathName: a => a.replace(/react_/, ''),
-      handleContent: content => Handlebars.compile(content)(query),
+      handleContent: content => Handlebars.compile(content)({
+        name: query.name,
+        react: query.type === 'react',
+        client: query.type === 'react' || query.type === 'client',
+      }),
       include,
       to: '',
     });
   },
-  webpack: (ctx, cb) => {
+  webpack: ({ query }, cb) => {
+    let from = path.resolve(__dirname, 'webpack/simple');
+    if (query.type === 'react') {
+      from = path.resolve(__dirname, 'webpack/react');
+    }
     cb({
-      from: path.resolve(__dirname, 'webpack'),
-      to: 'webpack',
-    });
-  },
-  'package/react': ({ query }, cb) => {
-    cb({
-      from: path.resolve(__dirname, 'config/package.json'),
-      handleContent: content => Handlebars.compile(content)({ name: query.name }),
+      from,
       to: '',
     });
   },
@@ -96,13 +94,13 @@ module.exports = {
       to: `${params.name}/src`,
       complete: () => {
         process.chdir(params.name);
-        command('tpl create reducer/quan');
-        command(`tpl create package/react?name=${params.name}`);
-        command('tpl create configs?type=react');
-        command('tpl create webpack');
-        command('tpl create components');
+        shelljs.exec(`tpl create "configs?type=react&name=${params.name}"`);
+        shelljs.exec('tpl create webpack?type=react');
+        shelljs.exec('tpl create components');
         if (query.type === 'view') {
-          command('tpl create react/view/View');
+          shelljs.exec('tpl create react/view/View');
+        } else {
+          shelljs.exec('tpl create reducer/quan');
         }
         const dependencies = [
           'classnames',
@@ -145,8 +143,8 @@ module.exports = {
           dependencies.push('history');
           dependencies.push('qs');
         }
-        command(`npm install ${dependencies.join(' ')}`);
-        command(`npm install --save-dev ${devDependencies.join(' ')}`);
+        shelljs.exec(`npm install ${dependencies.join(' ')}`);
+        shelljs.exec(`npm install --save-dev ${devDependencies.join(' ')}`);
       },
     });
   },
@@ -163,12 +161,20 @@ module.exports = {
     });
   },
   'container/component/:name': ({ params, query }) => {
-    command(`tpl create container/${params.name}?${qs.stringify(query)}`);
-    command(`tpl create component/${params.name}?${qs.stringify(query)}`);
+    shelljs.exec(`tpl create container/${params.name}?${qs.stringify(query)}`);
+    shelljs.exec(`tpl create component/${params.name}?${qs.stringify(query)}`);
+  },
+  'reducer/scene/root': (ctx, cb) => {
+    cb({
+      from: path.resolve(__dirname, 'reducer/sceneReducer.js'),
+      handlePathName: () => 'reducer.js',
+      to: 'src/data',
+    });
   },
   'reducer/:name': ({ query, params }, cb) => {
+    const from = path.resolve(__dirname, 'reducer/reducer.js');
     cb({
-      from: path.resolve(__dirname, 'reducer/reducer.js'),
+      from,
       handlePathName: name => (query.scene ? name : `${params.name}.js`),
       to: query.scene ?
         `src/scenes/${query.scene}/data/${params.name}` :
@@ -182,7 +188,7 @@ module.exports = {
               .map(a => path.basename(a, '.js')),
           scene: query.scene,
         };
-        command(`tpl update 'rootReducer?${qs.stringify(_query)}'`);
+        shelljs.exec(`tpl update 'rootReducer?${qs.stringify(_query)}'`);
       },
     });
   },
@@ -228,18 +234,33 @@ module.exports = {
           'koa-router',
           'koa-logger',
         ];
-        command(`npm install ${dependencies.join(' ')}`);
+        shelljs.exec('tpl create configs');
+        shelljs.exec(`npm install ${dependencies.join(' ')}`);
       },
     });
   },
   'test/:name': ({ params }) => {
-    try {
-      fs.readdirSync(params.name);
-    } catch (e) {
-      fs.mkdirSync(params.name);
+    if (!shelljs.test('-d', params.name)) {
+      shelljs.mkdir(params.name);
     }
     process.chdir(params.name);
-    command('tpl create configs');
-    command(`echo "console.log('hello world');" > index.js`); // eslint-disable-line
+    shelljs.exec('tpl create configs');
+    shelljs.exec(`echo "console.log('hello world');" > index.js`); // eslint-disable-line
+    // shelljs.exec(`tmux new-window -d -n ${params.name} "vim index.js"`);
+  },
+
+  'client/:name': ({ params }, cb) => {
+    if (!shelljs.test('-d', params.name)) {
+      shelljs.mkdir(params.name);
+    }
+    process.chdir(params.name);
+    cb({
+      from: path.resolve(__dirname, 'client'),
+      to: 'src',
+      complete: () => {
+        shelljs.exec(`tpl create "configs?type=client&name=${params.name}"`);
+        shelljs.exec('tpl create webpack');
+      },
+    });
   },
 };

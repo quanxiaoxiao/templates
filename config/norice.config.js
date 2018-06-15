@@ -1,5 +1,5 @@
 module.exports = {
-  webpack: require('./webpack/webpack.dev.js'),
+  webpack: require('./webpack.dev.js'),
   api: {
   },
 };
