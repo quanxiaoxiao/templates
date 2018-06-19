@@ -2,6 +2,7 @@ const qs = require('querystring');
 const path = require('path');
 const Handlebars = require('handlebars');
 const shelljs = require('shelljs');
+const alias = require('./alias');
 
 module.exports = {
   'component/:name': ({ params, query }, cb) => {
@@ -19,6 +20,7 @@ module.exports = {
       exclude,
       handleContent: content => Handlebars.compile(content)({
         name: query.name || params.name,
+        type: query.type,
       }),
       to,
     });
@@ -188,7 +190,7 @@ module.exports = {
       try {
         sceneList = shelljs.find('src/scenes/*/reducer.js')
           .map(pathName => ({
-            pathName: pathName.replace(/^src\//, ''),
+            pathName: pathName.replace(/^src\/([^.]+)\.js$/, '$1'),
             name: pathName.match(/\/([^/]+)\/reducer\.js$/)[1],
           }));
       } catch (e) {
@@ -266,4 +268,5 @@ module.exports = {
       },
     });
   },
+  ...alias,
 };
