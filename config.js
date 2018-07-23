@@ -116,6 +116,7 @@ module.exports = {
           'redux-thunk',
         ];
         const devDependencies = [
+          'autoprefixer',
           'babel-core',
           'babel-loader',
           'babel-preset-env',
@@ -250,6 +251,7 @@ module.exports = {
     }
     process.chdir(params.name);
     shelljs.exec('tpl create configs');
+    shelljs.exec('npm init -y');
     shelljs.exec(`echo "console.log('hello world');" > index.js`); // eslint-disable-line
     // shelljs.exec(`tmux new-window -d -n ${params.name} "vim index.js"`);
   },

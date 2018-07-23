@@ -27,31 +27,32 @@ module.exports = {
       cacheGroups: {
         react: {
           chunks: 'all',
-          test: ({ resource }) => resource && /node_modules\/react*/.test(resource),
+          test: ({ resource }) => resource && /node_modules\/(react|redux)(?!\w)/.test(resource),
           name: 'react',
           enforce: true,
           priority: 10,
         },
         lib: {
           chunks: 'all',
-          test: ({ resource }) => resource && /node_modules\/(moment|lodash)/.test(resource),
+          test: ({ resource }) => resource && /node_modules\/(moment|lodash)(?!\w)/.test(resource),
           name: 'lib',
           enforce: true,
           priority: 9,
         },
         d3: {
           chunks: 'all',
-          test: ({ resource }) => resource && /node_modules\/d3*/.test(resource),
+          test: ({ resource }) => resource && /node_modules\/d3(?!\w)/.test(resource),
           name: 'd3',
           enforce: true,
           priority: 8,
         },
         vendor: {
           chunks: 'all',
-          test: ({ resource }) => resource && /\/node_modules\//.test(resource),
+          test: ({ resource }) => resource &&
+            resource.indexOf(path.join(__dirname, 'node_modules')) === 0,
           name: 'vender',
           enforce: true,
-          priority: 7,
+          priority: 5,
         },
       },
     },
