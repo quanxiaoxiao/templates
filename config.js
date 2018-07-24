@@ -73,7 +73,7 @@ module.exports = {
       if (query.type === 'view') {
         shelljs.exec('tpl get react/view/View');
         shelljs.exec('tpl get react/view/Home');
-        shelljs.exec('tpl get reducer/resource?scene=root');
+        shelljs.exec('tpl get rootReducer?type=view');
       } else {
         shelljs.exec('tpl get reducer/resource');
       }
@@ -132,7 +132,7 @@ module.exports = {
       `src/containers/${params.name}`,
   }),
   'reducer/:name': ({ query, params }) => {
-    const toDir = (query.scene && query.scene !== 'root') ?
+    const toDir = query.scene ?
       `src/scenes/${query.scene}/data` :
       'src/data';
     return {
@@ -140,41 +140,67 @@ module.exports = {
       handlePathName: () => 'reducer.js',
       to: path.join(toDir, params.name),
       next: () => {
-        shelljs.exec(`tpl get 'rootReducer?${qs.stringify(query)}' --cover true`);
+        shelljs.exec(`tpl get rootReducer?${qs.stringify(query)} --cover true`);
       },
     };
   },
   rootReducer: ({ query }) => {
-    const toDir = (query.scene && query.scene !== 'root') ?
+    const toDir = query.scene ?
       `src/scenes/${query.scene}/data` :
       'src/data';
-    const list = shelljs.ls('-l', toDir)
-      .filter(item => item.isDirectory())
-      .map(item => item.name);
-    let sceneList = [];
-    if (query.scene === 'root') {
+    let list = [];
+    try {
+      list = shelljs.ls(toDir)
+        .filter(item => shelljs.test('-d', path.join(toDir, item)))
+        .map(name => ({
+          importName: `${name}Reducer`,
+          importPath: `./${name}/reducer`,
+          reduerLine: `${name}: ${name}Reducer`,
+        }));
+    } catch (error) {
+      // ignore
+    }
+    if (!query.scene && shelljs.test('-d', 'src/scenes')) {
       try {
-        sceneList = shelljs.find('src/scenes/*/reducer.js')
-          .map(pathName => ({
-            pathName: pathName.replace(/^src\/([^.]+)\.js$/, '$1'),
-            name: pathName.match(/\/([^/]+)\/reducer\.js$/)[1],
-          }));
+        list = [
+          ...shelljs.find('src/scenes/*/data/reducer.js')
+            .map((item) => {
+              const [, , name] = item.split('/');
+              const _name = name.replace(/^[A-Z]/, a => a.toLowerCase());
+              return {
+                importName: `${_name}Reducer`,
+                importPath: `scenes/${name}/data/reducer`,
+                reduerLine: `${name}: ${_name}Reducer`,
+              };
+            }),
+          ...list,
+        ];
       } catch (e) {
         // ignore
       }
+    }
+    if (!query.scene && query.type === 'view') {
+      list = [
+        {
+          importName: '{ routerReducer }',
+          importPath: 'react-router-redux',
+          reduerLine: 'router: routerReducer',
+        },
+        ...list,
+      ];
     }
     return {
       from: path.resolve(__dirname, 'reducer/rootReducer.js'),
       handlePathName: () => 'reducer.js',
       handleContent: content => Handlebars.compile(content)({
-        scene: query.scene && query.scene !== 'root',
-        hasRouter: query.scene === 'root',
-        sceneList,
-        list: list.map(name => ({
-          reducer: name,
-        })),
+        list,
       }),
-      to: (query.scene && query.scene !== 'root') ? `src/scenes/${query.scene}` : 'src/data',
+      to: toDir,
+      next: () => {
+        if (shelljs.test('-d', 'src/scenes') && query.scene) {
+          shelljs.exec('tpl get rootReducer?type=view --cover true');
+        }
+      },
     };
   },
   'action/:name': ({ params, query }) => ({
