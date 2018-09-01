@@ -1,5 +1,6 @@
 const qs = require('querystring');
 const path = require('path');
+const os = require('os');
 const Handlebars = require('handlebars');
 const shelljs = require('shelljs');
 const alias = require('./alias');
@@ -126,7 +127,10 @@ module.exports = {
   'container/:name': ({ params, query }) => ({
     from: path.resolve(__dirname, 'containers'),
     handlePathName: name => name.replace(/__name__(?=\.)/, query.name || params.name),
-    handleContent: content => Handlebars.compile(content)({ name: params.name }),
+    handleContent: content => Handlebars.compile(content)({
+      name: params.name,
+      fetchPolling: !!query.fetchPolling,
+    }),
     to: query.scene ?
       `src/scenes/${query.scene}/containers/${params.name}` :
       `src/containers/${params.name}`,
@@ -258,5 +262,14 @@ module.exports = {
       },
     };
   },
+  'server/:name': ({ params }) => ({
+    from: path.resolve(os.homedir(), 'soft/web-server'),
+    exclude: [/\.git\b/, /node_modules/, /logs/],
+    to: params.name,
+    next: () => {
+      process.chdir(params.name);
+      shelljs.exec('npm install');
+    },
+  }),
   ...alias,
 };
