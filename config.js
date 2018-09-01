@@ -91,15 +91,17 @@ module.exports = {
         'redux-thunk',
       ];
       const devDependencies = [
+        '@babel/core',
+        '@babel/preset-env',
+        '@babel/preset-react',
+        '@babel/plugin-transform-runtime',
+        '@babel/plugin-proposal-function-bind',
         'autoprefixer',
-        'babel-core',
         'babel-loader',
-        'babel-preset-env',
-        'babel-preset-react',
-        'babel-preset-stage-0',
         'css-loader',
         'extract-text-webpack-plugin@next',
         'html-webpack-plugin',
+        'postcss-calc',
         'postcss-color-function',
         'postcss-css-variables',
         'postcss-loader',
@@ -112,7 +114,6 @@ module.exports = {
         'webpack-cli',
         'webpack-hot-middleware',
         'webpack-merge',
-        'babel-plugin-transform-runtime',
       ];
       if (query.type === 'view') {
         dependencies.push('react-router-dom');

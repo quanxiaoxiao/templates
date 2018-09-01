@@ -14,5 +14,6 @@ module.exports = {
       },
     },
     'postcss-color-function': {},
+    'postcss-calc': {},
   },
 };

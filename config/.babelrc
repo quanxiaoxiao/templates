@@ -1,15 +1,39 @@
 {
 {{#if react}}
-  "presets": ["env", "react", "stage-0"],
-  {{else}}
-  "presets": ["env", "stage-0"],
+  "presets": ["@babel/preset-react"],
 {{/if}}
-  "plugins": ["transform-runtime"],
+  "plugins": [
+    "@babel/plugin-proposal-function-bind",
+    "@babel/plugin-transform-runtime"
+  ],
   "env" : {
-{{#if react}}
     "development": {
-      "plugins": ["react-hot-loader/babel"]
-    }
+{{#if react}}
+      "plugins": ["react-hot-loader/babel"],
 {{/if}}
+      "presets": [
+        [
+          "@babel/preset-env",
+          {
+            "targets": [
+              "last 1 chrome version"
+            ]
+          }
+        ]
+      ]
+    },
+    "production": {
+      "presets": [
+        [
+          "@babel/preset-env",
+          {
+            "targets": {
+              "chrome": 58,
+              "ie": 9
+            }
+          }
+        ]
+      ]
+    }
   }
 }
