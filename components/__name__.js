@@ -6,7 +6,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import style from './{{name}}.css';
 
-{{#if type}}
+{{#if clazz}}
 class {{name}} extends PureComponent {
   render() {
     return (

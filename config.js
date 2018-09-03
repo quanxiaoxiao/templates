@@ -20,8 +20,8 @@ module.exports = {
       handlePathName: name => name.replace(/__name__(?=\.)/, query.name || params.name),
       exclude,
       handleContent: content => Handlebars.compile(content)({
+        ...query,
         name: query.name || params.name,
-        type: query.type,
       }),
       to,
     };
@@ -76,7 +76,7 @@ module.exports = {
         shelljs.exec('tpl get react/view/Home');
         shelljs.exec('tpl get rootReducer?type=view');
       } else {
-        shelljs.exec('tpl get reducer/resource');
+        shelljs.exec('tpl get reducer/main');
       }
       const dependencies = [
         'classnames',
@@ -93,9 +93,13 @@ module.exports = {
       const devDependencies = [
         '@babel/core',
         '@babel/preset-env',
+        '@babel/runtime',
         '@babel/preset-react',
+        '@babel/plugin-proposal-class-properties',
+        '@babel/plugin-proposal-do-expressions',
         '@babel/plugin-transform-runtime',
         '@babel/plugin-proposal-function-bind',
+        '@babel/plugin-proposal-export-default-from',
         'autoprefixer',
         'babel-loader',
         'css-loader',
