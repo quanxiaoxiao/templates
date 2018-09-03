@@ -50,13 +50,13 @@ module.exports = {
   },
   webpack: ({ query }) => ({
     from: query.type === 'react' ?
-      path.resolve(__dirname, 'webpack/react') :
-      path.resolve(__dirname, 'webpack/simple'),
+      path.resolve(__dirname, 'webpack', 'react') :
+      path.resolve(__dirname, 'webpack', 'simple'),
   }),
   'react/view/:name': ({ params }) => ({
     from: path.resolve(__dirname, 'react-view', params.name === 'View' ? 'View' : 'Page'),
     handleContent: content => Handlebars.compile(content)({ name: params.name }),
-    to: `src/scenes/${params.name}`,
+    to: path.join('src', 'scenes', params.name),
   }),
   'react/:name': ({ query, params }) => ({
     from: path.resolve(__dirname, 'react'),
@@ -66,7 +66,7 @@ module.exports = {
       name: params.name,
       ...query,
     }),
-    to: `${params.name}/src`,
+    to: path.join(params.name, 'src'),
     next: () => {
       process.chdir(params.name);
       shelljs.exec(`tpl get "configs?type=react&name=${params.name}"`);
@@ -137,15 +137,15 @@ module.exports = {
       fetchPolling: !!query.fetchPolling,
     }),
     to: query.scene ?
-      `src/scenes/${query.scene}/containers/${params.name}` :
-      `src/containers/${params.name}`,
+      path.join('src', 'scenes', query.scenes, 'containers', params.name) :
+      params.join('src', 'containers', params.name),
   }),
   'reducer/:name': ({ query, params }) => {
     const toDir = query.scene ?
       `src/scenes/${query.scene}/data` :
       'src/data';
     return {
-      from: path.resolve(__dirname, 'reducer/reducer.js'),
+      from: path.resolve(__dirname, 'reducer', 'reducer.js'),
       handlePathName: () => 'reducer.js',
       to: path.join(toDir, params.name),
       next: () => {
@@ -155,8 +155,8 @@ module.exports = {
   },
   rootReducer: ({ query }) => {
     const toDir = query.scene ?
-      `src/scenes/${query.scene}/data` :
-      'src/data';
+      path.join('src', 'scenes', query.scenes, 'data') :
+      path.join('src', 'data');
     let list = [];
     try {
       list = shelljs.ls(toDir)
@@ -199,7 +199,7 @@ module.exports = {
       ];
     }
     return {
-      from: path.resolve(__dirname, 'reducer/rootReducer.js'),
+      from: path.resolve(__dirname, 'reducer', 'rootReducer.js'),
       handlePathName: () => 'reducer.js',
       handleContent: content => Handlebars.compile(content)({
         list,
@@ -213,7 +213,7 @@ module.exports = {
     };
   },
   'action/:name': ({ params, query }) => ({
-    from: path.resolve(__dirname, 'reducer/actions.js'),
+    from: path.resolve(__dirname, 'reducer', 'actions.js'),
     handleContent: content => Handlebars.compile(content)({
       name: params.name,
       scene: query.scene,
@@ -221,8 +221,8 @@ module.exports = {
       actionType: query.action.replace(/(.+?)(?=[A-Z])/g, a => `${a}_`).toUpperCase(),
     }),
     to: query.scene ?
-      `src/scenes/${query.scene}/data/${params.name}` :
-      `src/data/${query.name}`,
+      path.join('src', 'scenes', query.scenes, 'data', params.name) :
+      params.join('src', 'data', query.name),
   }),
   'koa/:name': ({ params }) => ({
     from: path.resolve(__dirname, 'koa'),
