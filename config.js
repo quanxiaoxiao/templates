@@ -5,6 +5,8 @@ const Handlebars = require('handlebars');
 const shelljs = require('shelljs');
 const alias = require('./alias');
 
+const templatesDir = path.resolve(__dirname, 'templates');
+
 module.exports = {
   'component/:name': ({ params, query }) => {
     const exclude = [];
@@ -16,7 +18,7 @@ module.exports = {
       to = `src/scenes/${query.scene}/components/${params.name}`;
     }
     return {
-      from: path.resolve(__dirname, 'components'),
+      from: path.join(templatesDir, 'components'),
       handlePathName: name => name.replace(/__name__(?=\.)/, query.name || params.name),
       exclude,
       handleContent: content => Handlebars.compile(content)({
@@ -39,7 +41,7 @@ module.exports = {
       include.push(/package\.json$/);
     }
     return {
-      from: path.resolve(__dirname, 'config'),
+      from: path.join(templatesDir, 'config'),
       handleContent: content => Handlebars.compile(content)({
         name: query.name,
         react: query.type === 'react',
@@ -50,16 +52,16 @@ module.exports = {
   },
   webpack: ({ query }) => ({
     from: query.type === 'react' ?
-      path.resolve(__dirname, 'webpack', 'react') :
-      path.resolve(__dirname, 'webpack', 'simple'),
+      path.join(templatesDir, 'webpack', 'react') :
+      path.join(templatesDir, 'webpack', 'simple'),
   }),
   'react/view/:name': ({ params }) => ({
-    from: path.resolve(__dirname, 'react-view', params.name === 'View' ? 'View' : 'Page'),
+    from: path.join(templatesDir, 'react-view', params.name === 'View' ? 'View' : 'Page'),
     handleContent: content => Handlebars.compile(content)({ name: params.name }),
     to: path.join('src', 'scenes', params.name),
   }),
   'react/:name': ({ query, params }) => ({
-    from: path.resolve(__dirname, 'react'),
+    from: path.join(templatesDir, 'react'),
     exclude: query.type === 'view' ? [/containers/] : [],
     handleContent: content => Handlebars.compile(content)({
       view: query.type === 'view',
@@ -132,7 +134,7 @@ module.exports = {
     },
   }),
   'container/:name': ({ params, query }) => ({
-    from: path.resolve(__dirname, 'containers'),
+    from: path.join(templatesDir, 'containers'),
     handlePathName: name => name.replace(/__name__(?=\.)/, query.name || params.name),
     handleContent: content => Handlebars.compile(content)({
       name: params.name,
@@ -147,7 +149,7 @@ module.exports = {
       path.join('src', 'scenes', query.scene, 'data') :
       path.join('src', 'data');
     return {
-      from: path.resolve(__dirname, 'reducer', 'reducer.js'),
+      from: path.join(templatesDir, 'reducer', 'reducer.js'),
       handlePathName: () => 'reducer.js',
       to: path.join(toDir, params.name),
       next: () => {
@@ -201,7 +203,7 @@ module.exports = {
       ];
     }
     return {
-      from: path.resolve(__dirname, 'reducer', 'rootReducer.js'),
+      from: path.join(templatesDir, 'reducer', 'rootReducer.js'),
       handlePathName: () => 'reducer.js',
       handleContent: content => Handlebars.compile(content)({
         list,
@@ -215,7 +217,7 @@ module.exports = {
     };
   },
   'action/:name': ({ params, query }) => ({
-    from: path.resolve(__dirname, 'reducer', 'actions.js'),
+    from: path.join(templatesDir, 'reducer', 'actions.js'),
     handleContent: content => Handlebars.compile(content)({
       name: params.name,
       scene: query.scene,
@@ -227,7 +229,7 @@ module.exports = {
       params.join('src', 'data', query.name),
   }),
   'koa/:name': ({ params }) => ({
-    from: path.resolve(__dirname, 'koa'),
+    from: path.join(templatesDir, 'koa'),
     to: params.name,
     handleContent: content => Handlebars.compile(content)({
       name: params.name,
@@ -261,7 +263,7 @@ module.exports = {
     }
     process.chdir(params.name);
     return {
-      from: path.resolve(__dirname, 'client'),
+      from: path.join(templatesDir, 'client'),
       to: 'src',
       next: () => {
         shelljs.exec(`tpl get "configs?type=client&name=${params.name}"`);
