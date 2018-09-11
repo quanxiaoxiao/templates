@@ -96,10 +96,12 @@ module.exports = {
         '@babel/runtime',
         '@babel/preset-react',
         '@babel/plugin-proposal-class-properties',
-        '@babel/plugin-proposal-do-expressions',
-        '@babel/plugin-transform-runtime',
         '@babel/plugin-proposal-function-bind',
         '@babel/plugin-proposal-export-default-from',
+        '@babel/plugin-proposal-do-expressions',
+        '@babel/plugin-proposal-optional-chaining',
+        '@babel/plugin-proposal-nullish-coalescing-operator',
+        '@babel/plugin-transform-runtime',
         'autoprefixer',
         'babel-loader',
         'css-loader',
@@ -137,13 +139,13 @@ module.exports = {
       fetchPolling: !!query.fetchPolling,
     }),
     to: query.scene ?
-      path.join('src', 'scenes', query.scenes, 'containers', params.name) :
-      params.join('src', 'containers', params.name),
+      path.join('src', 'scenes', query.scene, 'containers', params.name) :
+      path.join('src', 'containers', params.name),
   }),
   'reducer/:name': ({ query, params }) => {
     const toDir = query.scene ?
-      `src/scenes/${query.scene}/data` :
-      'src/data';
+      path.join('src', 'scenes', query.scene, 'data') :
+      path.join('src', 'data');
     return {
       from: path.resolve(__dirname, 'reducer', 'reducer.js'),
       handlePathName: () => 'reducer.js',
@@ -155,7 +157,7 @@ module.exports = {
   },
   rootReducer: ({ query }) => {
     const toDir = query.scene ?
-      path.join('src', 'scenes', query.scenes, 'data') :
+      path.join('src', 'scenes', query.scene, 'data') :
       path.join('src', 'data');
     let list = [];
     try {
@@ -221,7 +223,7 @@ module.exports = {
       actionType: query.action.replace(/(.+?)(?=[A-Z])/g, a => `${a}_`).toUpperCase(),
     }),
     to: query.scene ?
-      path.join('src', 'scenes', query.scenes, 'data', params.name) :
+      path.join('src', 'scenes', query.scene, 'data', params.name) :
       params.join('src', 'data', query.name),
   }),
   'koa/:name': ({ params }) => ({
