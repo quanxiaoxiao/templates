@@ -10,6 +10,8 @@ const webpackTemplates = require('./configs/webpack');
 const testTemplates = require('./configs/test');
 const reactSceneTemplates = require('./configs/reactScene');
 const clientTemplates = require('./configs/client');
+const dockerWebTemplates = require('./configs/dockerWeb');
+const serverTemplates = require('./configs/server');
 
 module.exports = {
   ...clientTemplates,
@@ -23,5 +25,7 @@ module.exports = {
   ...reactTemplates,
   ...reactComponentTemplates,
   ...reactContainerTemplates,
+  ...dockerWebTemplates,
+  ...serverTemplates,
   ...alias,
 };

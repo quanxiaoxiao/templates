@@ -1,0 +1,9 @@
+version: "3"
+services:
+  web_server:
+    image: "quanxiaoxiao/web:1"
+    ports:
+      - "3004:3000"
+    volumes:
+      - "$PWD/.:/api"
+    restart: always
