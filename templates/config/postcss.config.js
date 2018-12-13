@@ -1,6 +1,8 @@
 module.exports = {
   plugins: {
-    autoprefixer: {},
+    autoprefixer: {
+      browsers: ['IE >= 10'],
+    },
     'postcss-nested': {},
     'postcss-css-variables': {
       variables: {

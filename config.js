@@ -12,6 +12,7 @@ const reactSceneTemplates = require('./configs/reactScene');
 const clientTemplates = require('./configs/client');
 const dockerWebTemplates = require('./configs/dockerWeb');
 const serverTemplates = require('./configs/server');
+const noriceTempaltes = require('./configs/norice');
 
 module.exports = {
   ...clientTemplates,
@@ -27,5 +28,6 @@ module.exports = {
   ...reactContainerTemplates,
   ...dockerWebTemplates,
   ...serverTemplates,
+  ...noriceTempaltes,
   ...alias,
 };

@@ -1,0 +1,13 @@
+{
+  "name": "quan",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "norice -p 30088"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+  }
+}

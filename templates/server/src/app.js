@@ -27,34 +27,39 @@ middlewares.forEach((middleware) => {
   app.use(middleware);
 });
 
-app.use(router.routes()).use(router.allowedMethods());
+app.use(router.routes());
+app.use(router.allowedMethods());
 
 
 const routeList = apiParser(api);
 
 routeList
-  .filter(item => item.handleType !== 'socket')
-  .forEach(({ method, pathname, handle }) => {
-    router[method.toLowerCase()](pathname, handle);
+  .filter(item => item.handlerName !== 'wsProxy')
+  .forEach(({ method, pathname, handler }) => {
+    router[method.toLowerCase()](pathname, handler);
   });
 
-const server = http.createServer(app.callback()).listen(port, () => {
-  console.log(`server listen at port: ${port}`);
-});
+const server = http.createServer(app.callback())
+  .listen(port, () => {
+    console.log(`server listen at port: ${port}`);
+  });
 
-server.on('upgrade', (req, socket, head) => {
+server.on('upgrade', (req, socket) => {
   const { pathname } = url.parse(req.url);
-  const upgrade = routeList.find(item =>
-    item.pathname === pathname &&
-    item.method === 'GET' &&
-    item.handleType === 'socket');
+  const upgrade = routeList.find(item => item.pathname === pathname
+    && item.method === 'GET'
+    && item.handlerName === 'wsProxy');
   if (upgrade) {
     console.log('socket connection:', socket.remoteAddress);
-    upgrade.handle(req, socket, head);
+    upgrade.handler(req, socket, server);
   } else {
     console.log('socket destory:', socket.remoteAddress);
     socket.destroy();
   }
+});
+
+server.on('error', (error) => {
+  console.error(error);
 });
 
 process.on('uncaughtException', (error) => {
@@ -64,4 +69,3 @@ process.on('uncaughtException', (error) => {
   }, 3000);
   killTimer.unref();
 });
-

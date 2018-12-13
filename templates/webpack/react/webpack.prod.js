@@ -1,12 +1,16 @@
 const merge = require('webpack-merge');
 const webpack = require('webpack');
 const ExtractTextplugin = require('extract-text-webpack-plugin');
-const common = require('./webpack.common');
 const path = require('path');
+const common = require('./webpack.common');
 
 module.exports = merge(common, {
   mode: 'production',
-  entry: path.resolve(__dirname, 'src/index.js'),
+  entry: [
+    '@babel/polyfill',
+    'whatwg-fetch',
+    path.resolve(__dirname, 'src/index.js'),
+  ],
   module: {
     rules: [
       {

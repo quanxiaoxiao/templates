@@ -26,6 +26,7 @@ module.exports = {
         shelljs.exec('tpl get reducer/main');
       }
       const dependencies = [
+        '@babel/polyfill',
         'classnames',
         'lodash',
         'normalize.css',
@@ -36,6 +37,7 @@ module.exports = {
         'redux',
         'redux-promise',
         'redux-thunk',
+        'whatwg-fetch',
       ];
       const devDependencies = [
         '@babel/core',

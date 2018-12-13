@@ -13,6 +13,9 @@ module.exports = {
     if (query.scene) {
       to = `src/scenes/${query.scene}/components/${params.name}`;
     }
+    if (query.view) {
+      to = `src/View/components/${params.name}`;
+    }
     return {
       from: path.join(templatesDir, 'components'),
       handlePathName: name => name.replace(/__name__(?=\.)/, query.name || params.name),
